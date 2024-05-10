@@ -1,0 +1,169 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model broadcast {
+  boradcast_id                   Int               @id @default(autoincrement())
+  broadcast_title                String?           @db.VarChar(45)
+  broadcast_img                  String?           @db.VarChar(45)
+  broadcast_url                  String?           @db.VarChar(45)
+  broadcast_createdat            DateTime?         @db.Date
+  broadcast_modifiedat           DateTime?         @db.Date
+  categorybroad_categorybroad_id Int
+  categorybroad                  categorybroad     @relation(fields: [categorybroad_categorybroad_id], references: [categorybroad_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_broadcast_categorybroad1")
+  favoritestation                favoritestation[]
+  recentplayed                   recentplayed[]
+
+  @@index([categorybroad_categorybroad_id], map: "fk_broadcast_categorybroad1_idx")
+}
+
+model categorybroad {
+  categorybroad_id         Int         @id @default(autoincrement())
+  categorybroad_type       String?     @db.VarChar(45)
+  categorybroad_createdat  DateTime?   @db.DateTime(0)
+  categorybroad_modifiedat DateTime?   @db.DateTime(0)
+  broadcast                broadcast[]
+}
+
+model categoryevent {
+  categoryevent_id         Int       @id @default(autoincrement())
+  categoryevent_title      String?   @db.VarChar(45)
+  categoryevent_createdat  DateTime? @db.DateTime(0)
+  categoryevent_modifiedat DateTime? @db.DateTime(0)
+  event                    event[]
+}
+
+model event {
+  event_id                       Int           @id
+  event_title                    String?       @db.VarChar(45)
+  event_description              String?       @db.VarChar(45)
+  event_img                      String?       @db.Text
+  event_createdat                DateTime?     @db.Date
+  event_modifiedat               DateTime?     @db.Date
+  categoryevent_categoryevent_id Int
+  categoryevent                  categoryevent @relation(fields: [categoryevent_categoryevent_id], references: [categoryevent_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_event_categoryevent1")
+  userevents                     userevents[]
+
+  @@index([categoryevent_categoryevent_id], map: "fk_event_categoryevent1_idx")
+}
+
+model favoritepodcast {
+  favoritepodcast_id         Int       @id @default(autoincrement())
+  favoritepodcast_createdat  DateTime? @db.DateTime(0)
+  favoritepodcast_modifiedat DateTime? @db.DateTime(0)
+  podcast_podcast_id         Int
+  user_user_id               Int
+  podcast                    podcast   @relation(fields: [podcast_podcast_id], references: [podcast_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_favoritepodcast_podcast1")
+  user                       user      @relation(fields: [user_user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_favoritepodcast_user1")
+
+  @@index([podcast_podcast_id], map: "fk_favoritepodcast_podcast1_idx")
+  @@index([user_user_id], map: "fk_favoritepodcast_user1_idx")
+}
+
+model favoritestation {
+  favoritestation_id         Int       @id @default(autoincrement())
+  favoritestation_createdat  DateTime? @db.DateTime(0)
+  favoritestation_modifiedat DateTime? @db.DateTime(0)
+  broadcast_boradcast_id     Int
+  user_user_id               Int
+  broadcast                  broadcast @relation(fields: [broadcast_boradcast_id], references: [boradcast_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_favoritestation_broadcast1")
+  user                       user      @relation(fields: [user_user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_favoritestation_user1")
+
+  @@index([broadcast_boradcast_id], map: "fk_favoritestation_broadcast1_idx")
+  @@index([user_user_id], map: "fk_favoritestation_user1_idx")
+}
+
+model login {
+  login_id         Int       @id @default(autoincrement())
+  login_status     Int?
+  login_createdat  DateTime? @db.Date
+  login_modifiedat DateTime? @db.Date
+  user_user_id     Int
+  user             user      @relation(fields: [user_user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_login_user1")
+
+  @@index([user_user_id], map: "fk_login_user1_idx")
+}
+
+model otp {
+  otp_id         Int       @id @default(autoincrement())
+  otp_number     Int?
+  otp_createdat  DateTime? @db.Date
+  otp_modifiedat DateTime? @db.Date
+  user_user_id   Int
+  user           user      @relation(fields: [user_user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_otp_user")
+
+  @@index([user_user_id], map: "fk_otp_user_idx")
+}
+
+model podcast {
+  podcast_id         Int               @id @default(autoincrement())
+  podcast_title      String?           @db.VarChar(45)
+  podcast_img        String?           @db.VarChar(45)
+  podcast_type       String?           @db.VarChar(45)
+  podcast_url        String?           @db.VarChar(4555)
+  podcast_createdat  DateTime?         @db.Date
+  podcast_modifiedat DateTime?         @db.Date
+  favoritepodcast    favoritepodcast[]
+}
+
+model profile {
+  profile_id         Int       @id @default(autoincrement())
+  profile_name       String?   @db.VarChar(45)
+  profile_img        String?   @db.VarChar(45)
+  profile_email      String?   @db.VarChar(45)
+  profile_createdat  DateTime? @db.DateTime(0)
+  profile_location   String?   @db.VarChar(666)
+  profile_modifiedat DateTime? @db.DateTime(0)
+  user_user_id       Int
+  user               user      @relation(fields: [user_user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_profile_user1")
+
+  @@index([user_user_id], map: "fk_profile_user1_idx")
+}
+
+model recentplayed {
+  recentplayed_id         Int       @id @default(autoincrement())
+  recentplayed_createdat  DateTime? @db.DateTime(0)
+  recentplayed_modifiedat DateTime? @db.DateTime(0)
+  user_user_id            Int
+  broadcast_boradcast_id  Int
+  broadcast               broadcast @relation(fields: [broadcast_boradcast_id], references: [boradcast_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_recentplayed_broadcast1")
+  user                    user      @relation(fields: [user_user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_recentplayed_user1")
+
+  @@index([broadcast_boradcast_id], map: "fk_recentplayed_broadcast1_idx")
+  @@index([user_user_id], map: "fk_recentplayed_user1_idx")
+}
+
+model user {
+  user_id         Int               @id @default(autoincrement())
+  user_name       String?           @db.VarChar(45)
+  user_email      String?           @db.VarChar(455)
+  user_password   String?           @db.VarChar(495)
+  user_verify     Int?
+  user_createdat  DateTime?         @db.Date
+  user_modifiedat DateTime?         @db.Date
+  favoritepodcast favoritepodcast[]
+  favoritestation favoritestation[]
+  login           login[]
+  otp             otp[]
+  profile         profile[]
+  recentplayed    recentplayed[]
+  userevents      userevents[]
+}
+
+model userevents {
+  userevents_id         Int       @id @default(autoincrement())
+  userevents_createdat  DateTime? @db.DateTime(0)
+  userevents_modifiedat DateTime? @db.DateTime(0)
+  event_event_id        Int
+  user_user_id          Int
+  event                 event     @relation(fields: [event_event_id], references: [event_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_userevents_event1")
+  user                  user      @relation(fields: [user_user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_userevents_user1")
+
+  @@index([event_event_id], map: "fk_userevents_event1_idx")
+  @@index([user_user_id], map: "fk_userevents_user1_idx")
+}
