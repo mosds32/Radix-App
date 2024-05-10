@@ -47,3 +47,26 @@ export const addFavoritePodcast = asyncHandler(async(req, res, next) =>
     }
 });
 
+export const getPodcastFavorite = asyncHandler(async(req, res, next)  =>
+{
+try
+{
+        const getPodCastFavorite = await prisma.favoritepodcast.findMany(
+            {
+                where:
+                {
+                    user_user_id: req.user.user_id
+                }
+            }
+        );
+        if(getPodCastFavorite)
+            {
+                return res.status(200).json(new ApiResponse(200, "Get Favorite podcast", getPodCastFavorite));
+            }
+}
+catch(error)
+{
+    throw new ApiError(403, error?.message || "Error in Podcast");
+}
+
+});
