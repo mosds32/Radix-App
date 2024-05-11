@@ -20,8 +20,6 @@ if(getCategoryEvent)
     {
         return res.status(200).json(new ApiResponse(200, "Get Category Event", getCategoryEvent));
     }
-
-
 }
 catch(error)
 {
@@ -73,5 +71,28 @@ catch(error)
 }
 
 });
+export const getUserEvents = asyncHandler(async(req, res, next)  =>
+{
+try
+{
+const FindUser = await prisma.userevents.findMany(
+    {
+        where:
+        {
+           user_user_id: req.user.user_id 
+        }
+    }
+);
+if(FindUser)
+    {
+        return res.status(200).json(new ApiResponse(200, "Get Events", FindUser));
+    }
+}
+catch(error)
+{
+    throw new ApiError(403, error?.message || "Error in Getting Events");
+}
 
+
+} )
 
