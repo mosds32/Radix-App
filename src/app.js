@@ -2,7 +2,6 @@ import express from "express";
 import cors from 'cors';
 import cookieParser from "cookie-parser";
 
-
 const app = express()
 
 
@@ -44,4 +43,12 @@ app.use("/api/v1/podcast", PodCasteRoute);
 import RecentlyRoute from './routes/recently.routes.js';
 app.use("/api/v1/recent", RecentlyRoute);
 
-export { app }
+import FavoriteRoute from './routes/favorite.routes.js';
+app.use("/api/v1/favorite",FavoriteRoute);
+
+import ChatRouter from './routes/chat.routes.js';
+app.use("/api/v1/chat", ChatRouter);
+
+
+
+export { app };

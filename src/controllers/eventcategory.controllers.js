@@ -2,36 +2,29 @@ import {prisma} from '../client/client.js';
 import { ApiError } from '../utils/ApiError.js';
 import { ApiResponse } from '../utils/ApiResponse.js';
 import { asyncHandler } from '../utils/AsyncHandler.js';
-export const getCategoryEvent = asyncHandler(async(req, res, next) =>
-{
-try
-{
-const type = req.params.type;
 
-const getCategoryEvent = await prisma.categoryevent.findMany(
-    {
-        where:
-        {
-            categoryevent_title:type
-        }
-    }
-);
-if(getCategoryEvent)
-    {
-        return res.status(200).json(new ApiResponse(200, "Get Category Event", getCategoryEvent));
-    }
-}
-catch(error)
-{
-    throw new ApiError(403, error?.message ||  "Error in Category Event" );
-}
-
-});
 export const getEvents = asyncHandler(async(req, res, next) =>
 {
 try
 {
-    const getEvent = await prisma.event.findMany();
+    const type = req.params.type;
+    const findCategory = await prisma.category.findMany(
+        {
+            where:
+            {
+                category_type: type
+            }
+        }
+    );
+    const findId = await findCategory.map(getId=>getId.category_id);
+    const getEvent = await prisma.event.findMany(
+        {
+            where:
+            {
+                category_categorybroad_id:parseInt(findId)
+            }
+        }
+    );
     if(getEvent)
         {
             return res.status(200).json(new ApiResponse(200, "Get Event", getEvent));
@@ -93,6 +86,4 @@ catch(error)
     throw new ApiError(403, error?.message || "Error in Getting Events");
 }
 
-
-} )
-
+});

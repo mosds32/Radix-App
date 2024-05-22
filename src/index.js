@@ -7,7 +7,7 @@ dotenv.config({
     path : './.env'
 })
 
-app.listen(process.env.PORT || 5000,
+app.listen(process.env.PORT || 5008,
     ()=> {
         console.log(
         "⚙️ "+` Server is Running @ ${process.env.HTTP_PROTOCOL}://${process.env.ORIGIN}:${process.env.PORT}`

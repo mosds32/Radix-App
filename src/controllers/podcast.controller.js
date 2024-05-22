@@ -6,7 +6,25 @@ export const getPodcast = asyncHandler(async(req, res, next) =>
 {
 try
 {
-       const getPodcasts = await prisma.podcast.findMany();
+    const type = req.params.type;
+    const findCategory = await prisma.category.findMany(
+        {
+            where:
+            {
+                category_type: type
+            }
+        }
+    );
+    const findId = await findCategory.map(getId => getId.category_id);
+
+       const getPodcasts = await prisma.podcast.findMany(
+        {
+            where:
+            {
+                category_categorybroad_id: parseInt(findId)
+            }
+        }
+       );
        if(getPodcasts)
         {
 return res.status(200).json(new ApiResponse(200, "Get Podcast", getPodcasts));
@@ -17,56 +35,4 @@ catch(error)
     throw new ApiError(403, error?.message || "Error in PodCasts" );
 
 }
-});
-
-export const addFavoritePodcast = asyncHandler(async(req, res, next) =>
-{
-    try
-    {
-        const {podcast_id} = req.body;
-        const now = new Date(); 
-      const addFavorite = await prisma.favoritepodcast.create(
-        {
-           data:
-           {
-            podcast_podcast_id:parseInt(podcast_id),
-            user_user_id: req.user.user_id,
-            favoritepodcast_createdat:now,
-            favoritepodcast_modifiedat: now
-           }
-        }
-      );
-      if(addFavorite)
-        {
-            return res.status(200).json(new ApiResponse(200, "Favorite Added", addFavorite));
-        }
-    }
-    catch(error)
-    {
-       throw new ApiError(403, error?.message || "Error in Favorite");
-    }
-});
-
-export const getPodcastFavorite = asyncHandler(async(req, res, next)  =>
-{
-try
-{
-        const getPodCastFavorite = await prisma.favoritepodcast.findMany(
-            {
-                where:
-                {
-                    user_user_id: req.user.user_id
-                }
-            }
-        );
-        if(getPodCastFavorite)
-            {
-                return res.status(200).json(new ApiResponse(200, "Get Favorite podcast", getPodCastFavorite));
-            }
-}
-catch(error)
-{
-    throw new ApiError(403, error?.message || "Error in Podcast");
-}
-
 });

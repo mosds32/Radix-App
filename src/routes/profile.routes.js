@@ -11,4 +11,6 @@ router.route('/get-profile').get(getProfile);
 router.route('/edit-profile').put(upload.single('img'),EditProfile);
 
 
+
+
 export default router;

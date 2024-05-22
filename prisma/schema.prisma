@@ -8,74 +8,31 @@ datasource db {
 }
 
 model broadcast {
-  boradcast_id                   Int               @id @default(autoincrement())
-  broadcast_title                String?           @db.VarChar(45)
-  broadcast_img                  String?           @db.VarChar(45)
-  broadcast_url                  String?           @db.VarChar(45)
-  broadcast_createdat            DateTime?         @db.Date
-  broadcast_modifiedat           DateTime?         @db.Date
-  categorybroad_categorybroad_id Int
-  categorybroad                  categorybroad     @relation(fields: [categorybroad_categorybroad_id], references: [categorybroad_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_broadcast_categorybroad1")
-  favoritestation                favoritestation[]
-  recentplayed                   recentplayed[]
+  boradcast_id              Int            @id @default(autoincrement())
+  broadcast_title           String?        @db.VarChar(45)
+  broadcast_img             String?        @db.VarChar(45)
+  broadcast_url             String?        @db.VarChar(45)
+  broadcast_createdat       DateTime?      @db.Date
+  broadcast_modifiedat      DateTime?      @db.Date
+  category_categorybroad_id Int
+  category                  category       @relation(fields: [category_categorybroad_id], references: [category_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_broadcast_category1")
+  recentplayed              recentplayed[]
 
-  @@index([categorybroad_categorybroad_id], map: "fk_broadcast_categorybroad1_idx")
-}
-
-model categorybroad {
-  categorybroad_id         Int         @id @default(autoincrement())
-  categorybroad_type       String?     @db.VarChar(45)
-  categorybroad_createdat  DateTime?   @db.DateTime(0)
-  categorybroad_modifiedat DateTime?   @db.DateTime(0)
-  broadcast                broadcast[]
-}
-
-model categoryevent {
-  categoryevent_id         Int       @id @default(autoincrement())
-  categoryevent_title      String?   @db.VarChar(45)
-  categoryevent_createdat  DateTime? @db.DateTime(0)
-  categoryevent_modifiedat DateTime? @db.DateTime(0)
-  event                    event[]
+  @@index([category_categorybroad_id], map: "fk_broadcast_category1_idx")
 }
 
 model event {
-  event_id                       Int           @id
-  event_title                    String?       @db.VarChar(45)
-  event_description              String?       @db.VarChar(45)
-  event_img                      String?       @db.Text
-  event_createdat                DateTime?     @db.Date
-  event_modifiedat               DateTime?     @db.Date
-  categoryevent_categoryevent_id Int
-  categoryevent                  categoryevent @relation(fields: [categoryevent_categoryevent_id], references: [categoryevent_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_event_categoryevent1")
-  userevents                     userevents[]
+  event_id                  Int          @id
+  event_title               String?      @db.VarChar(45)
+  event_description         String?      @db.VarChar(45)
+  event_img                 String?      @db.Text
+  event_createdat           DateTime?    @db.Date
+  event_modifiedat          DateTime?    @db.Date
+  category_categorybroad_id Int
+  category                  category     @relation(fields: [category_categorybroad_id], references: [category_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_event_category1")
+  userevents                userevents[]
 
-  @@index([categoryevent_categoryevent_id], map: "fk_event_categoryevent1_idx")
-}
-
-model favoritepodcast {
-  favoritepodcast_id         Int       @id @default(autoincrement())
-  favoritepodcast_createdat  DateTime? @db.DateTime(0)
-  favoritepodcast_modifiedat DateTime? @db.DateTime(0)
-  podcast_podcast_id         Int
-  user_user_id               Int
-  podcast                    podcast   @relation(fields: [podcast_podcast_id], references: [podcast_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_favoritepodcast_podcast1")
-  user                       user      @relation(fields: [user_user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_favoritepodcast_user1")
-
-  @@index([podcast_podcast_id], map: "fk_favoritepodcast_podcast1_idx")
-  @@index([user_user_id], map: "fk_favoritepodcast_user1_idx")
-}
-
-model favoritestation {
-  favoritestation_id         Int       @id @default(autoincrement())
-  favoritestation_createdat  DateTime? @db.DateTime(0)
-  favoritestation_modifiedat DateTime? @db.DateTime(0)
-  broadcast_boradcast_id     Int
-  user_user_id               Int
-  broadcast                  broadcast @relation(fields: [broadcast_boradcast_id], references: [boradcast_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_favoritestation_broadcast1")
-  user                       user      @relation(fields: [user_user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_favoritestation_user1")
-
-  @@index([broadcast_boradcast_id], map: "fk_favoritestation_broadcast1_idx")
-  @@index([user_user_id], map: "fk_favoritestation_user1_idx")
+  @@index([category_categorybroad_id], map: "fk_event_category1_idx")
 }
 
 model login {
@@ -101,14 +58,17 @@ model otp {
 }
 
 model podcast {
-  podcast_id         Int               @id @default(autoincrement())
-  podcast_title      String?           @db.VarChar(45)
-  podcast_img        String?           @db.VarChar(45)
-  podcast_type       String?           @db.VarChar(45)
-  podcast_url        String?           @db.VarChar(4555)
-  podcast_createdat  DateTime?         @db.Date
-  podcast_modifiedat DateTime?         @db.Date
-  favoritepodcast    favoritepodcast[]
+  podcast_id           Int       @id @default(autoincrement())
+  podcast_title        String?   @db.VarChar(45)
+  podcast_img          String?   @db.VarChar(45)
+  podcast_type         String?   @db.VarChar(45)
+  podcast_url          String?   @db.VarChar(4555)
+  podcast_createdat    DateTime? @db.Date
+  podcast_modifiedat   DateTime? @db.Date
+  category_category_id Int
+  category             category  @relation(fields: [category_category_id], references: [category_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_podcast_category1")
+
+  @@index([category_category_id], map: "fk_podcast_category1_idx")
 }
 
 model profile {
@@ -139,15 +99,18 @@ model recentplayed {
 }
 
 model user {
-  user_id         Int               @id @default(autoincrement())
-  user_name       String?           @db.VarChar(45)
-  user_email      String?           @db.VarChar(455)
-  user_password   String?           @db.VarChar(495)
+  user_id         Int            @id @default(autoincrement())
+  user_name       String?        @db.VarChar(45)
+  user_email      String?        @db.VarChar(455)
+  user_password   String?        @db.VarChar(4565)
   user_verify     Int?
-  user_createdat  DateTime?         @db.Date
-  user_modifiedat DateTime?         @db.Date
-  favoritepodcast favoritepodcast[]
-  favoritestation favoritestation[]
+  user_createdat  DateTime?      @db.Date
+  user_modifiedat DateTime?      @db.Date
+  chatdetail      chatdetail[]
+  chatfile        chatfile[]
+  chatpost        chatpost[]
+  chatsave        chatsave[]
+  favorite        favorite[]
   login           login[]
   otp             otp[]
   profile         profile[]
@@ -166,4 +129,91 @@ model userevents {
 
   @@index([event_event_id], map: "fk_userevents_event1_idx")
   @@index([user_user_id], map: "fk_userevents_user1_idx")
+}
+
+model favorite {
+  favorite_id         Int       @id @default(autoincrement())
+  favorite_category   String?   @db.VarChar(455)
+  favorite_parent     Int?
+  favorite_child      Int?
+  favorite_createdat  DateTime? @db.DateTime(0)
+  favorite_modifiedat DateTime? @db.DateTime(0)
+  user_user_id        Int
+  user                user      @relation(fields: [user_user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_favoritepodcast_user1")
+
+  @@index([user_user_id], map: "fk_favoritepodcast_user1_idx")
+}
+
+model category {
+  category_id         Int         @id @default(autoincrement())
+  category_type       String?     @db.VarChar(445)
+  category_stype      String?     @db.VarChar(45)
+  category_img        String?     @db.VarChar(445)
+  category_text       String?     @db.VarChar(465)
+  category_createdat  DateTime?   @db.Date
+  category_modifiedat DateTime?   @db.Date
+  broadcast           broadcast[]
+  event               event[]
+  podcast             podcast[]
+}
+
+model chatdetail {
+  chatdetail_id         Int       @id @default(autoincrement())
+  chatdetail_like       Int?
+  chatdetail_comment    String?   @db.VarChar(4565)
+  chatdetail_createdat  DateTime? @db.DateTime(0)
+  chatdetail_modifiedat DateTime? @db.DateTime(0)
+  chatdetail_deletedat  DateTime? @db.DateTime(0)
+  user_user_id          Int
+  chatpost_chatpost_id  Int
+  chatpost              chatpost  @relation(fields: [chatpost_chatpost_id], references: [chatpost_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_chatdetail_chatpost1")
+  user                  user      @relation(fields: [user_user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_chatdetail_user1")
+
+  @@index([chatpost_chatpost_id], map: "fk_chatdetail_chatpost1_idx")
+  @@index([user_user_id], map: "fk_chatdetail_user1_idx")
+}
+
+model chatfile {
+  chatfile_id          Int       @id @default(autoincrement())
+  chatfile_filename    String?   @db.VarChar(4655)
+  chatfile_createdat   DateTime? @db.DateTime(0)
+  chatfile_modifiedat  DateTime? @db.DateTime(0)
+  chatpost_chatpost_id Int
+  user_user_id         Int
+  chatpost             chatpost  @relation(fields: [chatpost_chatpost_id], references: [chatpost_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_chatfile_chatpost1")
+  user                 user      @relation(fields: [user_user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_chatfile_user1")
+
+  @@index([chatpost_chatpost_id], map: "fk_chatfile_chatpost1_idx")
+  @@index([user_user_id], map: "fk_chatfile_user1_idx")
+}
+
+model chatpost {
+  chatpost_id        Int          @id @default(autoincrement())
+  chatpost_text      String?      @db.VarChar(45)
+  chatpost_is_staff  Int?
+  chatpost_createdat DateTime?    @db.DateTime(0)
+  chatpost_modfiedat DateTime?    @db.DateTime(0)
+  chatpost_deletedat DateTime?    @db.DateTime(0)
+  user_user_id       Int
+  chatdetail         chatdetail[]
+  chatfile           chatfile[]
+  user               user         @relation(fields: [user_user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_chatpost_user1")
+  chatsave           chatsave[]
+
+  @@index([user_user_id], map: "fk_chatpost_user1_idx")
+}
+
+model chatsave {
+  chatsave_id          Int       @id @default(autoincrement())
+  chatsave_is_save     Int?
+  chatsave_createdat   DateTime? @db.DateTime(0)
+  chatsave_modifiedat  DateTime? @db.DateTime(0)
+  chatsave_deletedat   DateTime? @db.DateTime(0)
+  chatpost_chatpost_id Int
+  user_user_id         Int
+  chatpost             chatpost  @relation(fields: [chatpost_chatpost_id], references: [chatpost_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_chatsave_chatpost1")
+  user                 user      @relation(fields: [user_user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_chatsave_user1")
+
+  @@index([chatpost_chatpost_id], map: "fk_chatsave_chatpost1_idx")
+  @@index([user_user_id], map: "fk_chatsave_user1_idx")
 }

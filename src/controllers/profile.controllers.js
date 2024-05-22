@@ -4,39 +4,33 @@ import { ApiResponse } from '../utils/ApiResponse.js';
 
 import { asyncHandler
  } from '../utils/AsyncHandler.js';
-
-export const addProfile = asyncHandler(async(req, res, next) =>
-{
-    try
-    {
-       const {name, email, location } = req.body;
-       const img = "/uploads/" + req.file.filename;
-       const now = new Date();
-       const createProfile = await prisma.profile.create(
-        {
-            data:
-            {
-                profile_name:name,
-                profile_email:email,
-                profile_location: location, 
+ export const addProfile = asyncHandler(async (req, res, next) => {
+    try {
+        const { name, email, location } = req.body;
+        // Ensure correct path to the image file
+        const img = "/uploads/" + req.file.filename;
+        const now = new Date();
+        const createProfile = await prisma.profile.create({
+            data: {
+                profile_name: name,
+                profile_email: email,
+                profile_location: location,
                 profile_img: img,
-                profile_createdat: now, 
+                profile_createdat: now,
                 profile_modifiedat: now,
                 user_user_id: req.user.user_id
             }
+        });
+        if (createProfile) {
+            // Pass data to the EJS template
+            return res.status(200).json(new ApiResponse(200, "Profile Created", createProfile));
         }
-       );
-       if(createProfile)
-        {
-            return res.status(200).json(new ApiResponse(200, "Profile Created", createProfile))
-        }
-
+    } catch (error) {
+        throw new ApiError(403, error?.message || "Error in Profile");
     }
-catch(error)
-{
-throw new ApiError(403, error?.message || "Error in Profile" );
-}
 });
+
+
 export const getProfile = asyncHandler(async(req, res, next) =>
 {
 try
@@ -53,7 +47,6 @@ if(getProfile)
     {
         return res.status(200).json(new ApiResponse(200, "Get Info", getProfile));
     }
-
 
 }
 catch(error)

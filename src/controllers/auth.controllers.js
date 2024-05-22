@@ -13,88 +13,89 @@ import pkg from 'lodash';
 const {now} = pkg;
 const {expression} = pkg;
 
-export const signup = asyncHandler(async(req, res, next) =>
-{
-try
-{
-
-const value = signUpValidator(req.body, res, "Signup");
-const {name, email, password} = value;
-
-const now = new Date();
-const user = await prisma.user.findFirst(
-    {
-        where:
-        {
-            user_email: email
-        }
-    }
-);
-if(user)
-    {
+export const signup = asyncHandler(async (req, res, next) => {
+    try {
+      const value = signUpValidator(req.body, res, "Signup");
+      const { name, email, password } = value;
+  
+      const now = new Date();
+  
+      // Check if the user already exists
+      const existingUser = await prisma.user.findFirst({
+        where: {
+          user_email: email,
+        },
+      });
+  
+      if (existingUser) {
         return res.status(200).json(new ApiResponse(200, "Signup User Already Exist"));
-    }
-const hashedPassword = await hashPassword(password);
-const newUser = await prisma.user.create(
-    {
-        data:
-        {
-            user_name: name,
-            user_email: email,
-            user_password: hashedPassword,
-            user_createdat: now,
-            user_verify: 0,
-            user_modifiedat: now
-        }
-    }
-);
-const currentUser = await prisma.user.findFirst(
-    {
-        where:
-        {
-            user_email: newUser.user_email
-        }
-    }
-);
-if(!currentUser)
-    {
+      }
+  
+      // Hash the password
+      const hashedPassword = await hashPassword(password);
+  
+      // Create the new user
+      const newUser = await prisma.user.create({
+        data: {
+          user_name: name,
+          user_email: email,
+          user_password: hashedPassword,
+          user_createdat: now,
+          user_verify: 0,
+          user_modifiedat: now,
+        },
+      });
+  
+      // Retrieve the newly created user to ensure it's created
+      const currentUser = await prisma.user.findFirst({
+        where: {
+          user_email: newUser.user_email,
+        },
+      });
+  
+      if (!currentUser) {
         return res.status(401).json(new ApiResponse(401, "Signup not Created"));
+      }
+  
+      // Generate the access token
+      const { accessToken } = generateToken(currentUser);
+      const otp = generateOTP();
+  
+      // Create OTP entry
+      await prisma.otp.create({
+        data: {
+          otp_number: otp,
+          otp_createdat: now,
+          otp_modifiedat: now,
+          user_user_id: currentUser.user_id,
+        },
+      });
+  
+      // Send OTP via email
+      mail(currentUser.user_email, otp);
+  
+      // Create login entry
+      await prisma.login.create({
+        data: {
+          login_status: 1,
+          login_createdat: now,
+          login_modifiedat: now,
+          user_user_id: currentUser.user_id,
+        },
+      });
+  
+      // Assign the accessToken to the response user object
+      currentUser.accessToken = accessToken;
+  
+      return res.status(200).cookie("accessToken", accessToken, cookieOptions).json(new ApiResponse(200, "User Signup", currentUser));
+  
+    } catch (error) {
+      // Log the error (you might want to use a logging library here)
+      console.error(error);
+      next(new ApiError(403, error?.message || "Error in Signup"));
     }
-
-
-const {accessToken} = generateToken(currentUser);
-const otp = generateOTP();
-await prisma.otp.create(
-    {
-        data:
-        {
-            otp_number: otp,
-            otp_createdat: now,
-            otp_modifiedat: now,
-            user_user_id: currentUser.user_id
-        }
-    }
-);
-mail(currentUser.user_email,otp);
-await prisma.login.create(
-    {
-        data:
-        {
-            login_status: 1,
-            login_createdat: now,
-            login_modifiedat: now,
-            user_user_id: currentUser.user_id
-        }
-    }
-);
-return res.status(200).cookie("accessToken", accessToken, cookieOptions).json(new ApiResponse(200, "User Signup", accessToken));
-
-}
-catch(error)
-{
-    throw new ApiError(403, error?.message || "Error in Signup");
-}
-});
+  });
+  
 export const login = asyncHandler(async(req, res, next) =>
 {
     try
